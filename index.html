@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+    <div id="base">
+        <input type="text" name="one" id="one" />
+        <input type="text" name="two" id="two" />
+        <button type="submit" id="submit">Отправить</button>
+        <button type="submit" id="getData">Отобразить</button>
+        <button type="submit" id="clear" style="display: none;">Очистить</button>
+        <table id="tab">
+        </table>
+    </div>
+    <script>
+        document
+            .getElementById('submit')
+            .addEventListener('click', function() {
+                let registerForm = document.forms['registerForm']
+                let one = document.getElementById("one").value
+                let two = document.getElementById("two").value
+                let data = JSON.stringify({
+                    one: one,
+                    two: two,
+                })
+                let request = new XMLHttpRequest()
+                request.open('POST', '/', true)
+                request.setRequestHeader(
+                    'Content-Type',
+                    'application/json'
+                )
+                request.addEventListener('load', function() {
+                    let recData = JSON.parse(request.response)
+                    console.log(request.response)
+                    if (recData.result === true) {
+                        document.getElementById("submit").style.backgroundColor = "green";
+                    } else {
+                        document.getElementById("submit").style.backgroundColor = "red";
+                    }
+                })
+                request.addEventListener('eror', function() {
+                    document.getElementById("submit").style.backgroundColor = "red";
+                })
+                request.onreadystatechange = function() {
+                    document.getElementById("submit").style.backgroundColor = "red";
+                };
+                request.send(data)
+            })
+
+        document
+            .getElementById('getData')
+            .addEventListener('click', function() {
+
+                let request = new XMLHttpRequest()
+                request.open('GET', '/table', true)
+                request.setRequestHeader(
+                    'Content-Type',
+                    'application/json'
+                )
+                request.addEventListener('load', function() {
+                    let recData = JSON.parse(request.response)
+                    recData.forEach((item) => {
+                        let tbody = document.getElementById('tab')
+                        let row = document.createElement("TR");
+                        tbody.appendChild(row);
+                        let td1 = document.createElement("TD");
+                        let td2 = document.createElement("TD");
+
+                        row.appendChild(td1);
+                        row.appendChild(td2);
+
+                        td1.innerHTML = item.one;
+                        td2.innerHTML = item.two;
+                    })
+                    document.getElementById("getData").disabled = true
+                    document.getElementById("clear").style.display = "inline"
+                })
+                request.send()
+            })
+        document
+            .getElementById('clear')
+            .addEventListener('click', () => {
+                document.getElementById("one").value = ""
+                document.getElementById("two").value = ""
+                document.getElementById("submit").style.backgroundColor = "rgb(239, 239, 239)";
+                document.getElementById("clear").style.display = "none"
+                while (document.getElementById('tab').rows.length) {
+                    document.getElementById('tab').deleteRow(0);
+                }
+                document.getElementById("getData").disabled = false
+            })
+    </script>
+</body>
+<html>
+
+</html>
+
+</html>
